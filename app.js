@@ -118,13 +118,26 @@ app.put("/artigos/:tituloArtigo", (req, res) => {
 })
 
 app.patch("/artigos/:tituloArtigo", (req, res) => {
-  console.log(req.body);
+  // Consulta o banco de dados para encontrar um artigo e atualizar o campo especificado
   Artigo.findOneAndUpdate(
     { titulo: req.params.tituloArtigo },
     { $set: req.body },
     (erros) => {
       if (!erros) {
         res.send("Artigo atualizado com sucesso.")
+      } else {
+        res.send(erros)
+      }
+    }
+  )
+})
+
+app.delete("/artigos/:tituloArtigo", (req, res) => {
+  Artigo.deleteOne(
+    { titulo: req.params.tituloArtigo },
+    (erros) => {
+      if (!erros) {
+        res.send("Artigo removido com sucesso.")
       } else {
         res.send(erros)
       }
