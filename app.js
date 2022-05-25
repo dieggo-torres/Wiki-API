@@ -47,7 +47,11 @@ app.get("/artigos", (req, res) => {
   // Consulta o banco de dados para encontrar todos os artigos
   Artigo.find({}, (erros, artigosEncontrados) => {
     if (!erros) {
-      res.send(artigosEncontrados)
+      if (artigosEncontrados) {
+        res.send(artigosEncontrados)
+      } else {
+        res.send("Não há artigos para exibir.")
+      }
     } else {
       res.send(erros)
     }
@@ -77,6 +81,21 @@ app.delete("/artigos", (req, res) => {
   Artigo.deleteMany({}, (erros) => {
     if (!erros) {
       res.send("Todos os artigos foram removidos com sucesso.")
+    } else {
+      res.send(erros)
+    }
+  })
+})
+
+app.get("/artigos/:tituloArtigo", (req, res) => {
+  // Consulta o banco de dados para verificar se existe um artigo com o título especificado
+  Artigo.findOne({ título:  req.params.tituloArtigo }, (erros, artigoEncontrado) => {
+    if (!erros) {
+      if (artigoEncontrado) {
+        res.send(artigoEncontrado)
+      } else {
+        res.send("Não existe nenhum artigo com o título especificado.")
+      }
     } else {
       res.send(erros)
     }
