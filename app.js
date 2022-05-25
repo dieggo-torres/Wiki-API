@@ -102,6 +102,21 @@ app.get("/artigos/:tituloArtigo", (req, res) => {
   })
 })
 
+app.put("/artigos/:tituloArtigo", (req, res) => {
+  // Consulta o banco de dados para encontrar o artigo a ser atualizado
+  Artigo.findOneAndUpdate(
+    { título: req.params.tituloArtigo },
+    { título: req.body.titulo, conteúdo: req.body.conteudo },
+    (erros) => {
+      if (!erros) {
+        res.send("Artigo atualizado com sucesso.")
+      } else {
+        res.send(erros)
+      }
+    }
+  )
+})
+
 app.listen(porta, () => {
   console.log(`Servidor Express ouvindo na porta ${porta}.`);
 })
