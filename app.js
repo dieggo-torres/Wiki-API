@@ -27,11 +27,11 @@ conectarDB()
 
 const artigoSchema = mongoose.Schema(
   {
-    título: {
+    titulo: {
       type: String,
       required: [true, "Por favor, adicione um título."],
     },
-    conteúdo: {
+    conteudo: {
       type: String,
       required: [true, "Por favor, adicione conteúdo."],
     }
@@ -61,8 +61,8 @@ app.get("/artigos", (req, res) => {
 app.post("/artigos", (req, res) => {
   // Cria um novo artigo
   const novoArtigo = new Artigo({
-    título: req.body.titulo,
-    conteúdo: req.body.conteudo,
+    titulo: req.body.titulo,
+    conteudo: req.body.conteudo,
   })
 
   // Salva o artigo recém-criado na coleção de artigos
@@ -105,8 +105,23 @@ app.get("/artigos/:tituloArtigo", (req, res) => {
 app.put("/artigos/:tituloArtigo", (req, res) => {
   // Consulta o banco de dados para encontrar o artigo a ser atualizado
   Artigo.findOneAndUpdate(
-    { título: req.params.tituloArtigo },
-    { título: req.body.titulo, conteúdo: req.body.conteudo },
+    { titulo: req.params.tituloArtigo },
+    { titulo: req.body.titulo, conteudo: req.body.conteudo },
+    (erros) => {
+      if (!erros) {
+        res.send("Artigo atualizado com sucesso.")
+      } else {
+        res.send(erros)
+      }
+    }
+  )
+})
+
+app.patch("/artigos/:tituloArtigo", (req, res) => {
+  console.log(req.body);
+  Artigo.findOneAndUpdate(
+    { titulo: req.params.tituloArtigo },
+    { $set: req.body },
     (erros) => {
       if (!erros) {
         res.send("Artigo atualizado com sucesso.")
