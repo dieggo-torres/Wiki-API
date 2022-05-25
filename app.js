@@ -15,7 +15,7 @@ app.use(express.static("public"))
 
 async function conectarDB() {
   try {
-    const conexao = await mongoose.connect("mongodb://localhost:27017/WikiDB")
+    const conexao = await mongoose.connect(process.env.CONNECTION_STRING)
     console.log(`MongoDB conectado com sucesso: ${conexao.connection.host}`.cyan.underline)
   } catch (erro) {
     console.log(erro)
@@ -133,6 +133,7 @@ app.patch("/artigos/:tituloArtigo", (req, res) => {
 })
 
 app.delete("/artigos/:tituloArtigo", (req, res) => {
+  // Consulta o banco de dados para remover o artigo cujo título foi especificado
   Artigo.deleteOne(
     { titulo: req.params.tituloArtigo },
     (erros) => {
