@@ -11,8 +11,76 @@ app.use(express.urlencoded({ extended: true }))
 
 app.set("view engine", "ejs")
 
-app.get("/", (req, res) => {
-  res.send("<h1>Olá, mundo!</h1>")
+app.use(express.static("public"))
+
+async function conectarDB() {
+  try {
+    const conexao = await mongoose.connect("mongodb://localhost:27017/WikiDB")
+    console.log(`MongoDB conectado com sucesso: ${conexao.connection.host}`.cyan.underline)
+  } catch (erro) {
+    console.log(erro)
+    process.exit(1)
+  }
+}
+
+conectarDB()
+
+const artigoSchema = mongoose.Schema(
+  {
+    título: {
+      type: String,
+      required: [true, "Por favor, adicione um título."],
+    },
+    conteúdo: {
+      type: String,
+      required: [true, "Por favor, adicione conteúdo."],
+    }
+  },
+  {
+    timestamps: true,
+  }
+)
+
+const Artigo = mongoose.model("artigo", artigoSchema)
+
+app.get("/artigos", (req, res) => {
+  // Consulta o banco de dados para encontrar todos os artigos
+  Artigo.find({}, (erros, artigosEncontrados) => {
+    if (!erros) {
+      res.send(artigosEncontrados)
+    } else {
+      res.send(erros)
+    }
+  })
+})
+
+app.post("/artigos", (req, res) => {
+  // Cria um novo artigo
+  const novoArtigo = new Artigo({
+    título: req.body.titulo,
+    conteúdo: req.body.conteudo,
+  })
+
+  // Salva o artigo recém-criado na coleção de artigos
+  novoArtigo.save((erros) => {
+    if (!erros) {
+      console.log("Novo artigo adicionado com sucesso.");
+      res.redirect("/artigos")
+    } else {
+      console.log(erros);
+    }
+  })
+})
+
+app.delete("/artigos", (req, res) => {
+  // Remove todos os artigos da coleção
+  Artigo.deleteMany({}, (erros) => {
+    if (!erros) {
+      res.send("Todos os artigos foram removidos com sucesso.")
+    } else {
+      res.send(erros)
+    }
+  })
 })
 
 app.listen(porta, () => {
